@@ -1,0 +1,269 @@
+:root {
+  --impi-red: #DE1819;
+  --impi-gold: #B8942E;
+  --impi-dark: #231F20;
+  --gray-bg: #f4f4f5;
+  --border: #e0e0e0;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Calibri, "Segoe UI", Arial, sans-serif;
+  background: var(--gray-bg);
+  color: var(--impi-dark);
+}
+
+.topbar {
+  background: var(--impi-red);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 4px solid var(--impi-gold);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-logo {
+  height: 42px;
+  width: auto;
+  background: #fff;
+  border-radius: 6px;
+  padding: 3px;
+}
+
+.login-logo {
+  display: block;
+  height: 70px;
+  width: auto;
+  margin: 0 auto 14px;
+}
+
+.verify-logo {
+  display: block;
+  height: 50px;
+  width: auto;
+  margin: 0 auto 8px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 3px;
+}
+
+.topbar h1 {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.topbar .sub {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.topbar button {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.tabs button.active {
+  background: var(--impi-dark);
+  color: #fff;
+  border-color: var(--impi-dark);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 16px;
+  border-bottom: 2px solid var(--impi-red);
+  padding-bottom: 6px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 10px 0 4px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+button.primary {
+  background: var(--impi-red);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 14px;
+  font-weight: 600;
+}
+
+button.secondary {
+  background: var(--impi-gold);
+  color: #231F20;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.danger {
+  background: #6b1414;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: #fafafa;
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge.active { background: #e6f4ea; color: #1e7e34; }
+.badge.expired { background: #fdecea; color: #b3261e; }
+.badge.returned { background: #eceff1; color: #444; }
+.badge.revoked { background: #fdecea; color: #b3261e; }
+
+.msg { padding: 10px; border-radius: 5px; font-size: 13px; margin-bottom: 10px; }
+.msg.ok { background: #e6f4ea; color: #1e7e34; }
+.msg.err { background: #fdecea; color: #b3261e; }
+
+.login-wrap {
+  max-width: 340px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  border-top: 6px solid var(--impi-red);
+}
+
+.footer-note {
+  font-size: 11px;
+  color: #777;
+  text-align: center;
+  padding: 20px;
+}
+
+/* --- Public verification page --- */
+.verify-wrap {
+  max-width: 420px;
+  margin: 30px auto;
+  padding: 16px;
+}
+
+.permit-card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.permit-head {
+  background: var(--impi-dark);
+  color: #fff;
+  padding: 16px;
+  text-align: center;
+}
+
+.permit-status {
+  padding: 14px 16px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.permit-status.active { background: #1e7e34; color: #fff; }
+.permit-status.expired { background: #b3261e; color: #fff; }
+.permit-status.returned { background: #555; color: #fff; }
+.permit-status.revoked { background: #b3261e; color: #fff; }
+
+.permit-body { padding: 16px; }
+
+.permit-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 14px;
+}
+
+.permit-row .label { color: #666; }
+.permit-row .value { font-weight: 700; text-align: right; }

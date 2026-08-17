@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMPI Permit Verification</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="verify-wrap">
+  <div class="permit-card">
+    <div class="permit-head">
+      <img src="assets/impi-logo.png" alt="IMPI Protection Agency" class="verify-logo" onerror="this.style.display='none'">
+      <strong>IMPI PROTECTION AGENCY (PTY) LTD</strong><br>
+      <span style="font-size:12px;">Digital Firearm Permit Verification</span>
+    </div>
+    <div id="statusBanner" class="permit-status">Loading…</div>
+    <div class="permit-body" id="permitBody"></div>
+  </div>
+  <div class="footer-note">
+    This is a live verification of a permit issued by <strong>IMPI Protection Agency (Pty) Ltd</strong>
+    under Section 20 of the Firearms Control Act 60 of 2000. The officer must also carry
+    their physical firearm competency certificate while on duty.<br><br>
+    10 Kosmos Crescent, Rynoue AH, Roodeplaat, Pretoria &middot; info@impi-secure.co.za &middot; 083 782 2207
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+async function loadPermit() {
+  const supabase = window.supabase.createClient(
+    window.IMPI_CONFIG.SUPABASE_URL,
+    window.IMPI_CONFIG.SUPABASE_ANON_KEY
+  );
+
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  const banner = document.getElementById("statusBanner");
+  const body = document.getElementById("permitBody");
+
+  if (!token) {
+    banner.textContent = "NO TOKEN PROVIDED";
+    banner.classList.add("revoked");
+    return;
+  }
+
+  const { data: permit, error } = await supabase
+    .from("permits")
+    .select("*, officers(full_name, id_number, competency_number, competency_expiry), firearms(make, model, calibre, serial_number), issuers(full_name, id_number)")
+    .eq("token", token)
+    .maybeSingle();
+
+  if (error || !permit) {
+    banner.textContent = "PERMIT NOT FOUND";
+    banner.classList.add("revoked");
+    return;
+  }
+
+  let status = permit.status;
+  if (status === "active" && new Date(permit.valid_until) < new Date()) status = "expired";
+
+  const statusText = {
+    active: "VALID",
+    expired: "EXPIRED",
+    returned: "RETURNED / CLOSED",
+    revoked: "REVOKED",
+  }[status] || status.toUpperCase();
+
+  banner.textContent = statusText;
+  banner.classList.add(status === "active" ? "active" : status);
+
+  body.innerHTML = `
+    <div class="permit-row"><span class="label">Permit Ref</span><span class="value">${permit.token}</span></div>
+    <div class="permit-row"><span class="label">Officer</span><span class="value">${permit.officers?.full_name || "—"}</span></div>
+    <div class="permit-row"><span class="label">ID Number</span><span class="value">${permit.officers?.id_number || "—"}</span></div>
+    <div class="permit-row"><span class="label">Competency No.</span><span class="value">${permit.officers?.competency_number || "—"}</span></div>
+    <div class="permit-row"><span class="label">Firearm</span><span class="value">${permit.firearms?.make || ""} ${permit.firearms?.model || ""}</span></div>
+    <div class="permit-row"><span class="label">Calibre</span><span class="value">${permit.firearms?.calibre || "—"}</span></div>
+    <div class="permit-row"><span class="label">Serial No.</span><span class="value">${permit.firearms?.serial_number || "—"}</span></div>
+    <div class="permit-row"><span class="label">Ammunition Issued</span><span class="value">${permit.ammunition_qty}</span></div>
+    <div class="permit-row"><span class="label">Duty Location</span><span class="value">${permit.duty_location || "—"}</span></div>
+    <div class="permit-row"><span class="label">Issued</span><span class="value">${new Date(permit.issued_at).toLocaleString("en-ZA")}</span></div>
+    <div class="permit-row"><span class="label">Valid Until</span><span class="value">${new Date(permit.valid_until).toLocaleString("en-ZA")}</span></div>
+    <div class="permit-row"><span class="label">Issued By</span><span class="value">${permit.issuers?.full_name || "—"}</span></div>
+  `;
+}
+loadPermit();
+</script>
+</body>
+</html>

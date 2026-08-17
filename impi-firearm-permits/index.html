@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMPI Digital Firearm Permit System</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="loginScreen" class="login-wrap">
+  <img src="assets/impi-logo.png" alt="IMPI Protection Agency" class="login-logo" onerror="this.style.display='none'">
+  <h2 style="margin-top:0;color:#DE1819;">IMPI Protection Agency (Pty) Ltd</h2>
+  <p style="font-size:13px;color:#555;">Digital Firearm Permit System — Authorised issuer login</p>
+  <div id="loginMsg"></div>
+  <label>Email</label>
+  <input type="email" id="loginEmail" autocomplete="username">
+  <label>Password</label>
+  <input type="password" id="loginPassword" autocomplete="current-password">
+  <button class="primary" style="width:100%" onclick="doLogin()">Log In</button>
+</div>
+
+<div id="app" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-left">
+      <img src="assets/impi-logo.png" alt="IMPI" class="topbar-logo" onerror="this.style.display='none'">
+      <div>
+        <h1>IMPI Protection Agency (Pty) Ltd</h1>
+        <div class="sub">Digital Firearm Permit System — <span id="issuerLabel">—</span></div>
+      </div>
+    </div>
+    <button onclick="doLogout()">Log Out</button>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="issue" onclick="showTab('issue')">Issue Permit</button>
+      <button class="tab-btn" data-tab="active" onclick="showTab('active')">Active / Book In</button>
+      <button class="tab-btn" data-tab="officers" onclick="showTab('officers')">Officers</button>
+      <button class="tab-btn" data-tab="firearms" onclick="showTab('firearms')">Firearms</button>
+      <button class="tab-btn" data-tab="register" onclick="showTab('register')">Full Register</button>
+    </div>
+
+    <!-- ISSUE PERMIT -->
+    <div class="tab-panel" id="tab-issue">
+      <div class="card">
+        <h2>Issue New Permit</h2>
+        <div id="issueMsg"></div>
+        <label>Officer</label>
+        <select id="issueOfficer"></select>
+        <label>Firearm</label>
+        <select id="issueFirearm"></select>
+        <label>Ammunition quantity issued</label>
+        <input type="number" id="issueAmmo" value="0" min="0">
+        <label>Duty location</label>
+        <input type="text" id="issueLocation" placeholder="e.g. Springfest — Main Gate">
+        <label>Purpose / duration of possession</label>
+        <textarea id="issuePurpose" rows="2" placeholder="e.g. Armed static guard duty for event shift"></textarea>
+        <label>Valid until</label>
+        <input type="datetime-local" id="issueValidUntil">
+        <button class="primary" onclick="issuePermit()">Issue Permit &amp; Send via WhatsApp</button>
+      </div>
+    </div>
+
+    <!-- ACTIVE / BOOK IN -->
+    <div class="tab-panel" id="tab-active" style="display:none;">
+      <div class="card">
+        <h2>Active Permits</h2>
+        <div id="activeMsg"></div>
+        <table id="activeTable">
+          <thead><tr><th>Officer</th><th>Firearm</th><th>Valid Until</th><th>Status</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OFFICERS -->
+    <div class="tab-panel" id="tab-officers" style="display:none;">
+      <div class="card">
+        <h2>Add Officer</h2>
+        <div id="officerMsg"></div>
+        <label>Full name</label>
+        <input type="text" id="offName">
+        <label>ID number</label>
+        <input type="text" id="offId">
+        <label>PSIRA number</label>
+        <input type="text" id="offPsira">
+        <label>Firearm competency number</label>
+        <input type="text" id="offCompNo">
+        <label>Competency expiry date</label>
+        <input type="date" id="offCompExp">
+        <label>WhatsApp number (format 27XXXXXXXXX)</label>
+        <input type="text" id="offPhone" placeholder="27821234567">
+        <button class="primary" onclick="addOfficer()">Add Officer</button>
+      </div>
+      <div class="card">
+        <h2>Officers on File</h2>
+        <table id="officersTable">
+          <thead><tr><th>Name</th><th>ID No.</th><th>Competency No.</th><th>Expiry</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FIREARMS -->
+    <div class="tab-panel" id="tab-firearms" style="display:none;">
+      <div class="card">
+        <h2>Add Firearm</h2>
+        <div id="firearmMsg"></div>
+        <label>Make</label>
+        <input type="text" id="fMake">
+        <label>Model</label>
+        <input type="text" id="fModel">
+        <label>Calibre</label>
+        <input type="text" id="fCalibre">
+        <label>Serial number</label>
+        <input type="text" id="fSerial">
+        <label>Section 20 licence reference</label>
+        <input type="text" id="fLicenceRef">
+        <button class="primary" onclick="addFirearm()">Add Firearm</button>
+      </div>
+      <div class="card">
+        <h2>Firearms on File</h2>
+        <table id="firearmsTable">
+          <thead><tr><th>Make/Model</th><th>Calibre</th><th>Serial</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FULL REGISTER -->
+    <div class="tab-panel" id="tab-register" style="display:none;">
+      <div class="card">
+        <h2>Full Permit Register</h2>
+        <p style="font-size:12px;color:#666;">Complete record per Firearms Control Regulations 5(5) — export for audit/compliance.</p>
+        <button class="secondary" onclick="exportRegisterCSV()">Export CSV</button>
+        <table id="registerTable" style="margin-top:10px;">
+          <thead><tr><th>Officer</th><th>Firearm</th><th>Issuer</th><th>Issued</th><th>Valid Until</th><th>Returned</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="footer-note">
+    IMPI Protection Agency (Pty) Ltd &middot; 10 Kosmos Crescent, Rynoue AH, Roodeplaat, Pretoria<br>
+    info@impi-secure.co.za &middot; 083 782 2207<br>
+    Internal compliance tool. Not a substitute for the officer's physical firearm competency certificate.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
