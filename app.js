@@ -2,7 +2,7 @@
 // IMPI Digital Firearm Permit System — app logic
 // ============================================================
 
-const supabase = window.supabase.createClient(
+window.supabase = window.supabase.createClient(
   window.IMPI_CONFIG.SUPABASE_URL,
   window.IMPI_CONFIG.SUPABASE_ANON_KEY
 );
