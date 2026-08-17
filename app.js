@@ -157,6 +157,35 @@ async function addFirearm() {
   await loadAll();
 }
 
+// ---------- WhatsApp message builder (shared by auto-send and manual link) ----------
+function buildPermitMessage({ officerName, idNumber, competencyNumber, firearm, ammo, location, validUntil, issuerName, verifyUrl }) {
+  return `*IMPI PROTECTION AGENCY (PTY) LTD — DIGITAL FIREARM PERMIT*
+
+Officer: ${officerName}
+ID Number: ${idNumber}
+Competency No.: ${competencyNumber}
+
+Firearm: ${firearm}
+Ammunition issued: ${ammo}
+Duty location: ${location || "—"}
+
+Valid until: ${new Date(validUntil).toLocaleString("en-ZA")}
+Issued by: ${issuerName}
+
+Verify this permit: ${verifyUrl}
+
+Keep this message and your physical competency certificate on you at all times while on duty.
+
+IMPI Protection Agency (Pty) Ltd
+10 Kosmos Crescent, Rynoue AH, Roodeplaat, Pretoria
+info@impi-secure.co.za | 083 782 2207`;
+}
+
+function buildWhatsAppLink(phone, message) {
+  const digits = phone.replace(/[^\d]/g, "");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
 // ---------- Issue permit ----------
 function generateToken() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no confusing chars
@@ -199,11 +228,24 @@ async function issuePermit() {
 
   await supabase.from("firearms").update({ status: "issued" }).eq("id", firearmId);
 
-  // Send via WhatsApp using Netlify function (Twilio WhatsApp API)
+  // Send via WhatsApp — tries automatic Twilio send first (if configured),
+  // always also offers the manual tap-to-send link as a fallback/backup.
   const officer = officersCache.find(o => o.id === officerId);
   const firearm = firearmsCache.find(f => f.id === firearmId);
   const verifyUrl = `${window.location.origin}/verify.html?token=${token}`;
+  const messageText = buildPermitMessage({
+    officerName: officer.full_name,
+    idNumber: officer.id_number,
+    competencyNumber: officer.competency_number,
+    firearm: `${firearm.make} ${firearm.model} (${firearm.serial_number})`,
+    ammo, location, validUntil,
+    issuerName: currentIssuer.full_name,
+    verifyUrl,
+  });
+  const manualLink = buildWhatsAppLink(officer.phone_number, messageText);
+  const manualLinkHtml = `<br><a href="${manualLink}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;background:#25D366;color:#fff;padding:8px 14px;border-radius:5px;text-decoration:none;font-weight:600;">📱 Tap to send via WhatsApp yourself</a>`;
 
+  let autoSent = false;
   try {
     const resp = await fetch("/.netlify/functions/send-permit", {
       method: "POST",
@@ -222,14 +264,16 @@ async function issuePermit() {
       }),
     });
     const result = await resp.json();
-    if (result.ok) {
-      await supabase.from("permits").update({ whatsapp_sent: true }).eq("id", permit.id);
-      msgEl.innerHTML = `<div class="msg ok">Permit ${token} issued and sent via WhatsApp to ${officer.full_name}.</div>`;
-    } else {
-      msgEl.innerHTML = `<div class="msg err">Permit ${token} saved, but WhatsApp send failed: ${result.error || "unknown error"}. Verification link: ${verifyUrl}</div>`;
-    }
+    autoSent = !!result.ok;
   } catch (e) {
-    msgEl.innerHTML = `<div class="msg err">Permit ${token} saved, but WhatsApp send failed. Verification link: ${verifyUrl}</div>`;
+    autoSent = false;
+  }
+
+  if (autoSent) {
+    await supabase.from("permits").update({ whatsapp_sent: true }).eq("id", permit.id);
+    msgEl.innerHTML = `<div class="msg ok">Permit ${token} issued and sent automatically via WhatsApp to ${officer.full_name}.${manualLinkHtml}</div>`;
+  } else {
+    msgEl.innerHTML = `<div class="msg ok">Permit ${token} issued and saved. Twilio auto-send isn't set up yet — tap below to send it to ${officer.full_name} yourself:${manualLinkHtml}</div>`;
   }
 
   document.getElementById("issueAmmo").value = "0";
@@ -316,7 +360,7 @@ function exportRegisterCSV() {
     rows.push([
       p.token,
       p.officers?.full_name || "",
-      "", // ID number not joined here; pull from officersCache if needed
+      "",
       "",
       `${p.firearms?.make || ""} ${p.firearms?.model || ""}`,
       p.firearms?.serial_number || "",
@@ -345,7 +389,6 @@ function exportRegisterCSV() {
   const { data } = await supabase.auth.getSession();
   if (data.session) {
     document.getElementById("loginEmail").value = "";
-    // Re-trigger login flow to populate issuer + data
     const { data: userData } = await supabase.auth.getUser();
     if (userData?.user) {
       let { data: issuerRow } = await supabase
