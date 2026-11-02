@@ -2,90 +2,176 @@
 <html lang="en-ZA">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IMPI Permit Verification</title>
-<link rel="stylesheet" href="styles.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0b0e">
+<title>Permit Verification — IMPI Protection Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0b0e;--s1:#13151a;--s2:#1c1f28;--line:#2a2e3a;--tx:#f2f3f5;--mut:#9aa0ad;--red:#d42b2b;--gold:#f5c800;--grn:#22c55e;--amb:#f59e0b;
+  --paper:#ffffff;--ink:#16181d;--ink2:#5b616e;--rule:#e3e5ea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;min-height:100vh;
+  background-image:radial-gradient(900px 400px at 50% -10%,rgba(212,43,43,.16),transparent 70%)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;max-width:560px;margin:0 auto}
+.top img{height:38px;display:block}
+.secure{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--mut);letter-spacing:.06em;text-transform:uppercase}
+.secure svg{width:14px;height:14px;fill:var(--grn)}
+.wrap{max-width:560px;margin:0 auto;padding:4px 16px 40px}
+.sheet{background:var(--paper);color:var(--ink);border-radius:14px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.55);position:relative}
+.banner{padding:20px 20px 18px;display:flex;gap:14px;align-items:center;color:#fff}
+.banner.valid{background:linear-gradient(135deg,#128a43,#22c55e)}
+.banner.expired,.banner.revoked,.banner.notfound{background:linear-gradient(135deg,#a11d1d,#d42b2b)}
+.banner.returned{background:linear-gradient(135deg,#475066,#6b7488)}
+.banner.checking{background:var(--s2)}
+.ico{flex:none;width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center}
+.ico svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.banner h1{font-family:Montserrat,sans-serif;font-weight:900;font-size:22px;letter-spacing:.02em;line-height:1.1}
+.banner p{font-size:13px;opacity:.92;margin-top:3px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 14px;border-bottom:3px solid var(--red);position:relative}
+.head:after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:#b8942e}
+.head img{height:44px}
+.head .t{text-align:right}
+.head .t b{font-family:Montserrat,sans-serif;font-weight:800;font-size:12px;letter-spacing:.08em;display:block}
+.head .t span{font-size:10.5px;color:var(--ink2)}
+.permno{margin:22px 20px 4px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.permno small{display:block;font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
+.permno code{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;color:var(--red);letter-spacing:.03em}
+.chip{font-size:11px;font-weight:700;letter-spacing:.08em;padding:5px 11px;border-radius:99px;text-transform:uppercase}
+.chip.valid{background:#dcfce7;color:#15803d}.chip.expired,.chip.revoked{background:#fee2e2;color:#b91c1c}.chip.returned{background:#e5e7eb;color:#4b5563}
+.sec{padding:14px 20px 4px}
+.sec h2{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:var(--ink);padding:6px 10px 6px 14px;border-radius:3px;position:relative}
+.sec h2:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--red);border-radius:3px 0 0 3px}
+.kv{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--rule)}
+.kv>div{padding:10px 4px 10px 2px}
+.kv>div+div{padding-left:14px;border-left:1px solid var(--rule)}
+.kv.one{grid-template-columns:1fr}
+.kv label{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin-bottom:3px}
+.kv span{font-size:15px;font-weight:600;word-break:break-word}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+.red{color:#b91c1c}
+.foot{margin:18px 20px 0;padding:14px 0 18px;border-top:1px dashed #c9ccd4;font-size:11px;color:var(--ink2);line-height:1.55}
+.foot b{color:var(--ink)}
+.live{display:flex;align-items:center;gap:8px;margin:16px 20px 0;font-size:12px;color:var(--ink2);font-weight:500}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:p 1.8s infinite}
+.dot.off{background:var(--red);animation:none}
+@keyframes p{70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.watermark{position:absolute;inset:0;pointer-events:none;display:grid;place-items:center;overflow:hidden}
+.watermark span{transform:rotate(-24deg);font-family:Montserrat,sans-serif;font-weight:900;font-size:68px;letter-spacing:.08em;opacity:.07;color:#b91c1c;white-space:nowrap}
+.state{padding:30px 22px 26px;text-align:center}
+.state p{color:var(--ink2);font-size:14px;line-height:1.6;margin-top:8px}
+.contact{text-align:center;margin-top:18px;font-size:11.5px;color:var(--mut);line-height:1.7}
+.contact b{color:var(--tx)}
+.spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--red);border-radius:50%;animation:s .8s linear infinite;margin:0 auto}
+@keyframes s{to{transform:rotate(360deg)}}
+@media(max-width:420px){.permno code{font-size:22px}.kv span{font-size:14px}.banner h1{font-size:19px}}
+</style>
 </head>
 <body>
-<div class="verify-wrap">
-  <div class="permit-card">
-    <div class="permit-head">
-      <img src="assets/impi-logo.png" alt="IMPI Protection Agency" class="verify-logo" onerror="this.style.display='none'">
-      <strong>IMPI PROTECTION AGENCY (PTY) LTD</strong><br>
-      <span style="font-size:12px;">Digital Firearm Permit Verification</span>
-    </div>
-    <div id="statusBanner" class="permit-status">Loading…</div>
-    <div class="permit-body" id="permitBody"></div>
+<div class="top">
+  <img src="assets/impi-logo.png" alt="IMPI Protection Agency">
+  <div class="secure"><svg viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4Zm-1.2 15.2-3.5-3.5 1.4-1.4 2.1 2.1 5-5 1.4 1.4-6.4 6.4Z"/></svg>Official verification</div>
+</div>
+<div class="wrap">
+  <div class="sheet" id="sheet">
+    <div class="state"><div class="spin"></div><p>Verifying permit…</p></div>
   </div>
-  <div class="footer-note">
-    This is a live verification of a permit issued by <strong>IMPI Protection Agency (Pty) Ltd</strong>
-    under Section 20 of the Firearms Control Act 60 of 2000. The officer must also carry
-    their physical firearm competency certificate while on duty.<br><br>
-    10 Kosmos Crescent, Rynoue AH, Roodeplaat, Pretoria &middot; info@impi-secure.co.za &middot; 083 782 2207
+  <div class="contact">
+    <b>IMPI Protection Agency (Pty) Ltd</b> · PSIRA No. 2939801<br>
+    10 Kosmos Crescent, Rynoue AH, Roodeplaat, Pretoria<br>
+    Tel 012 543 0640 · info@impi-secure.co.za
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
-async function loadPermit() {
-  const supabase = window.supabase.createClient(
-    window.IMPI_CONFIG.SUPABASE_URL,
-    window.IMPI_CONFIG.SUPABASE_ANON_KEY
-  );
+(function(){
+  'use strict';
+  var TZ='Africa/Johannesburg';
+  var $=function(id){return document.getElementById(id)};
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+  function fdt(v){if(!v)return '—';var d=new Date(v);if(isNaN(d))return '—';return d.toLocaleString('en-ZA',{timeZone:TZ,day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})}
+  function fd(v){if(!v)return '—';var d=new Date(String(v).length<=10?v+'T12:00:00':v);if(isNaN(d))return '—';return d.toLocaleDateString('en-ZA',{timeZone:TZ,day:'2-digit',month:'short',year:'numeric'})}
+  function maskId(id){var s=String(id||'').replace(/\s/g,'');return s.length>=9?s.slice(0,6)+'••••'+s.slice(-3):'••••••••••'}
 
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
-  const banner = document.getElementById("statusBanner");
-  const body = document.getElementById("permitBody");
+  var ICON={
+    ok:'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    no:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+    ret:'<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>'
+  };
 
-  if (!token) {
-    banner.textContent = "NO TOKEN PROVIDED";
-    banner.classList.add("revoked");
-    return;
+  function state(kind,title,msg){
+    $('sheet').innerHTML='<div class="banner '+kind+'"><div class="ico">'+(kind==='returned'?ICON.ret:ICON.no)+'</div><div><h1>'+esc(title)+'</h1><p>'+esc(msg)+'</p></div></div>'+
+      '<div class="state"><p>If you believe this is an error, contact IMPI Protection Agency on <b>012 543 0640</b>.</p></div>';
   }
 
-  const { data: permit, error } = await supabase
-    .from("permits")
-    .select("*, officers(full_name, id_number, competency_number, competency_expiry), firearms(make, model, calibre, serial_number), issuers(full_name, id_number)")
-    .eq("token", token)
-    .maybeSingle();
-
-  if (error || !permit) {
-    banner.textContent = "PERMIT NOT FOUND";
-    banner.classList.add("revoked");
-    return;
+  function render(p){
+    var now=new Date();
+    var st=p.status;
+    if(st==='active'&&new Date(p.valid_until)<now)st='expired';
+    var cls=st==='active'?'valid':st;
+    var banner={
+      valid:['PERMIT VALID','Firearm lawfully issued to the officer named below.',ICON.ok],
+      expired:['PERMIT EXPIRED','The validity period has ended. This permit is no longer valid.',ICON.no],
+      returned:['FIREARM RETURNED','The firearm has been booked back in. This permit is closed.',ICON.ret],
+      revoked:['PERMIT REVOKED','This permit has been withdrawn by the issuer.',ICON.no]
+    }[cls];
+    var chipTxt={valid:'Valid',expired:'Expired',returned:'Closed',revoked:'Revoked'}[cls];
+    var compExpired=p.competency_expiry&&new Date(p.competency_expiry+'T23:59:59')<now;
+    var h='';
+    h+='<div class="banner '+cls+'"><div class="ico">'+banner[2]+'</div><div><h1>'+banner[0]+'</h1><p>'+banner[1]+'</p></div></div>';
+    h+='<div class="head"><img src="assets/impi-logo.png" alt="IMPI"><div class="t"><b>FIREARM ISSUE PERMIT</b><span>Firearms Control Act 60 of 2000</span></div></div>';
+    h+='<div class="permno"><div><small>Permit number</small><code>'+esc(p.token)+'</code></div><span class="chip '+cls+'">'+chipTxt+'</span></div>';
+    h+='<div class="sec"><h2>Authorised officer</h2>'+
+      '<div class="kv one"><div><label>Full name</label><span>'+esc(p.officer_name)+'</span></div></div>'+
+      '<div class="kv"><div><label>Identity number</label><span class="mono">'+esc(p.id_masked||maskId(p.id_number))+'</span></div><div><label>Competency cert. no.</label><span class="mono">'+esc(p.competency_number)+'</span></div></div>'+
+      '<div class="kv"><div><label>Competency expiry</label><span class="'+(compExpired?'red':'')+'">'+esc(fd(p.competency_expiry))+(compExpired?' (expired)':'')+'</span></div><div><label>PSIRA no.</label><span>'+esc(p.psira_number||'—')+'</span></div></div></div>';
+    h+='<div class="sec"><h2>Firearm</h2>'+
+      '<div class="kv"><div><label>Make &amp; model</label><span>'+esc((p.firearm_make||'')+' '+(p.firearm_model||''))+'</span></div><div><label>Calibre</label><span>'+esc(p.firearm_calibre)+'</span></div></div>'+
+      '<div class="kv"><div><label>Serial number</label><span class="mono">'+esc(p.firearm_serial)+'</span></div><div><label>Rounds issued</label><span>'+esc(p.ammunition_qty==null?'—':p.ammunition_qty)+'</span></div></div></div>';
+    h+='<div class="sec"><h2>Authorisation</h2>'+
+      '<div class="kv"><div><label>Issued</label><span>'+esc(fdt(p.issued_at))+'</span></div><div><label>Valid until</label><span class="'+(cls==='valid'?'':'red')+'">'+esc(fdt(p.valid_until))+'</span></div></div>'+
+      '<div class="kv one"><div><label>Duty location</label><span>'+esc(p.duty_location||'—')+'</span></div></div>'+
+      '<div class="kv one"><div><label>Purpose of possession</label><span>'+esc(p.purpose||'—')+'</span></div></div>'+
+      '<div class="kv"><div><label>Issued by</label><span>'+esc(p.issuer_name||'—')+'</span></div><div><label>Designation</label><span>'+esc(p.issuer_role||'—')+'</span></div></div>'+
+      (p.returned_at?'<div class="kv one"><div><label>Booked in</label><span>'+esc(fdt(p.returned_at))+'</span></div></div>':'')+'</div>';
+    h+='<div class="live"><i class="dot'+(cls==='valid'?'':' off')+'"></i><span id="liveTxt"></span></div>';
+    h+='<div class="foot"><b>For SAPS / Metro Police:</b> this record is read live from the IMPI Protection Agency permit register. The officer must also produce the <b>original firearm competency certificate</b> and identity document. The identity number is partly hidden to protect personal information.</div>';
+    if(cls!=='valid')h+='<div class="watermark"><span>'+(cls==='returned'?'CLOSED':cls==='revoked'?'REVOKED':'EXPIRED')+'</span></div>';
+    $('sheet').innerHTML=h;
+    function tick(){var e=$('liveTxt');if(e)e.textContent='Checked live · '+new Date().toLocaleString('en-ZA',{timeZone:TZ,day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' SAST'}
+    tick();setInterval(tick,1000);
   }
 
-  let status = permit.status;
-  if (status === "active" && new Date(permit.valid_until) < new Date()) status = "expired";
-
-  const statusText = {
-    active: "VALID",
-    expired: "EXPIRED",
-    returned: "RETURNED / CLOSED",
-    revoked: "REVOKED",
-  }[status] || status.toUpperCase();
-
-  banner.textContent = statusText;
-  banner.classList.add(status === "active" ? "active" : status);
-
-  body.innerHTML = `
-    <div class="permit-row"><span class="label">Permit Ref</span><span class="value">${permit.token}</span></div>
-    <div class="permit-row"><span class="label">Officer</span><span class="value">${permit.officers?.full_name || "—"}</span></div>
-    <div class="permit-row"><span class="label">ID Number</span><span class="value">${permit.officers?.id_number || "—"}</span></div>
-    <div class="permit-row"><span class="label">Competency No.</span><span class="value">${permit.officers?.competency_number || "—"}</span></div>
-    <div class="permit-row"><span class="label">Firearm</span><span class="value">${permit.firearms?.make || ""} ${permit.firearms?.model || ""}</span></div>
-    <div class="permit-row"><span class="label">Calibre</span><span class="value">${permit.firearms?.calibre || "—"}</span></div>
-    <div class="permit-row"><span class="label">Serial No.</span><span class="value">${permit.firearms?.serial_number || "—"}</span></div>
-    <div class="permit-row"><span class="label">Ammunition Issued</span><span class="value">${permit.ammunition_qty}</span></div>
-    <div class="permit-row"><span class="label">Duty Location</span><span class="value">${permit.duty_location || "—"}</span></div>
-    <div class="permit-row"><span class="label">Issued</span><span class="value">${new Date(permit.issued_at).toLocaleString("en-ZA")}</span></div>
-    <div class="permit-row"><span class="label">Valid Until</span><span class="value">${new Date(permit.valid_until).toLocaleString("en-ZA")}</span></div>
-    <div class="permit-row"><span class="label">Issued By</span><span class="value">${permit.issuers?.full_name || "—"}</span></div>
-  `;
-}
-loadPermit();
+  async function run(){
+    var token=(new URLSearchParams(location.search).get('token')||'').trim().toUpperCase();
+    if(!token){state('notfound','NO PERMIT NUMBER','Scan the QR code on the permit or open the verification link again.');return}
+    var cfg=window.IMPI_CONFIG||{};
+    var client=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+    try{
+      var r=await client.rpc('verify_permit',{p_token:token});
+      if(!r.error){
+        var row=Array.isArray(r.data)?r.data[0]:r.data;
+        if(!row||row.found===false){state('notfound','PERMIT NOT FOUND','No permit with number '+token+' exists in the IMPI register. Treat this document as NOT genuine.');return}
+        return render(row);
+      }
+      // fallback (before the security script has been run)
+      var q=await client.from('permits').select('*, officer:officers(*), firearm:firearms(*), issuer:issuers(*)').eq('token',token).maybeSingle();
+      if(q.error)throw q.error;
+      if(!q.data){state('notfound','PERMIT NOT FOUND','No permit with number '+token+' exists in the IMPI register. Treat this document as NOT genuine.');return}
+      var d=q.data;
+      render({token:d.token,status:d.status,valid_until:d.valid_until,issued_at:d.issued_at,returned_at:d.returned_at,
+        officer_name:d.officer&&d.officer.full_name,id_masked:maskId(d.officer&&d.officer.id_number),
+        competency_number:d.officer&&d.officer.competency_number,competency_expiry:d.officer&&d.officer.competency_expiry,psira_number:d.officer&&d.officer.psira_number,
+        firearm_make:d.firearm&&d.firearm.make,firearm_model:d.firearm&&d.firearm.model,firearm_calibre:d.firearm&&d.firearm.calibre,firearm_serial:d.firearm&&d.firearm.serial_number,
+        ammunition_qty:d.ammunition_qty,duty_location:d.duty_location,purpose:d.purpose,
+        issuer_name:d.issuer&&d.issuer.full_name,issuer_role:d.issuer&&d.issuer.role});
+    }catch(e){state('notfound','CANNOT VERIFY','The register could not be reached. Check your connection and try again.')}
+  }
+  run();
+})();
 </script>
 </body>
 </html>

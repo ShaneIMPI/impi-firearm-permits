@@ -2,155 +2,234 @@
 <html lang="en-ZA">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IMPI Digital Firearm Permit System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0b0e">
+<title>Firearm Permit Register — IMPI Protection Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<!-- ============ LOGIN ============ -->
 <div id="loginScreen" class="login-wrap">
-  <img src="assets/impi-logo.png" alt="IMPI Protection Agency" class="login-logo" onerror="this.style.display='none'">
-  <h2 style="margin-top:0;color:#DE1819;">IMPI Protection Agency (Pty) Ltd</h2>
-  <p style="font-size:13px;color:#555;">Digital Firearm Permit System — Authorised issuer login</p>
-  <div id="loginMsg"></div>
-  <label>Email</label>
-  <input type="email" id="loginEmail" autocomplete="username">
-  <label>Password</label>
-  <input type="password" id="loginPassword" autocomplete="current-password">
-  <button class="primary" style="width:100%" onclick="doLogin()">Log In</button>
+  <form class="login-card" id="loginForm" autocomplete="on">
+    <img src="assets/impi-logo.png" alt="IMPI">
+    <h1>Firearm Permit Register</h1>
+    <p class="sub">IMPI Protection Agency (Pty) Ltd &middot; Authorised issuers only</p>
+    <div id="loginMsg"></div>
+    <div class="field">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password" required>
+    </div>
+    <button class="btn block" id="loginBtn" type="submit">Log in</button>
+  </form>
 </div>
 
-<div id="app" style="display:none;">
-  <div class="topbar">
-    <div class="topbar-left">
-      <img src="assets/impi-logo.png" alt="IMPI" class="topbar-logo" onerror="this.style.display='none'">
-      <div>
-        <h1>IMPI Protection Agency (Pty) Ltd</h1>
-        <div class="sub">Digital Firearm Permit System — <span id="issuerLabel">—</span></div>
+<!-- ============ APP ============ -->
+<div id="app" hidden>
+  <header class="nav">
+    <div class="brand">
+      <img src="assets/impi-logo.png" alt="IMPI">
+      <div class="brand-text">
+        <div class="brand-title">Firearm Permit Register</div>
+        <div class="brand-sub">IMPI Protection Agency (Pty) Ltd</div>
       </div>
     </div>
-    <button onclick="doLogout()">Log Out</button>
-  </div>
+    <div class="nav-right">
+      <button class="user-pill" id="profileBtn" title="My details" type="button">
+        <i class="dot"></i><span class="name" id="issuerLabel">—</span>
+      </button>
+      <button class="btn ghost small" id="logoutBtn" type="button">Log out</button>
+    </div>
+  </header>
 
-  <div class="container">
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="issue" onclick="showTab('issue')">Issue Permit</button>
-      <button class="tab-btn" data-tab="active" onclick="showTab('active')">Active / Book In</button>
-      <button class="tab-btn" data-tab="officers" onclick="showTab('officers')">Officers</button>
-      <button class="tab-btn" data-tab="firearms" onclick="showTab('firearms')">Firearms</button>
-      <button class="tab-btn" data-tab="register" onclick="showTab('register')">Full Register</button>
+  <main class="container">
+    <div class="page-head">
+      <div class="eyebrow">Compliance &middot; Firearms Control Act</div>
+      <h1 class="page-title">Permit register</h1>
     </div>
 
-    <!-- ISSUE PERMIT -->
-    <div class="tab-panel" id="tab-issue">
+    <section class="stats" id="stats"></section>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="issue" type="button">Issue permit</button>
+      <button class="tab" data-tab="active" type="button">Active &amp; book in<span class="count" id="activeCount">0</span></button>
+      <button class="tab" data-tab="register" type="button">Full register</button>
+      <button class="tab" data-tab="officers" type="button">Officers</button>
+      <button class="tab" data-tab="firearms" type="button">Firearms</button>
+    </nav>
+
+    <!-- ISSUE -->
+    <section class="panel" id="tab-issue">
       <div class="card">
-        <h2>Issue New Permit</h2>
+        <div class="card-title">Issue a new permit</div>
+        <p class="card-sub">The permit is saved to the register, then you can send the signed-off PDF docket straight to the officer on WhatsApp.</p>
         <div id="issueMsg"></div>
-        <label>Officer</label>
-        <select id="issueOfficer"></select>
-        <label>Firearm</label>
-        <select id="issueFirearm"></select>
-        <label>Ammunition quantity issued</label>
-        <input type="number" id="issueAmmo" value="0" min="0">
-        <label>Duty location</label>
-        <input type="text" id="issueLocation" placeholder="e.g. Springfest — Main Gate">
-        <label>Purpose / duration of possession</label>
-        <textarea id="issuePurpose" rows="2" placeholder="e.g. Armed static guard duty for event shift"></textarea>
-        <label>Valid until</label>
-        <input type="datetime-local" id="issueValidUntil">
-        <button class="primary" onclick="issuePermit()">Issue Permit &amp; Send via WhatsApp</button>
+        <form id="issueForm" autocomplete="off">
+          <div class="grid2">
+            <div class="field">
+              <label for="issueOfficer">Officer</label>
+              <select id="issueOfficer"></select>
+              <div class="hint" id="officerHint"></div>
+            </div>
+            <div class="field">
+              <label for="issueFirearm">Firearm</label>
+              <select id="issueFirearm"></select>
+              <div class="hint" id="firearmHint"></div>
+            </div>
+            <div class="field">
+              <label for="issueAmmo">Ammunition issued (rounds)</label>
+              <input type="number" id="issueAmmo" value="0" min="0" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="issueLocation">Duty location</label>
+              <input type="text" id="issueLocation" placeholder="e.g. Springfest — Main Gate">
+            </div>
+            <div class="field full">
+              <label for="issuePurpose">Purpose of possession</label>
+              <textarea id="issuePurpose" rows="2" placeholder="e.g. Armed static guard duty for event shift"></textarea>
+            </div>
+            <div class="field full">
+              <label for="issueValidUntil">Valid until</label>
+              <input type="datetime-local" id="issueValidUntil" required>
+              <div class="chips">
+                <button type="button" class="chip" data-hours="12">+12 hours</button>
+                <button type="button" class="chip" data-hours="24">+24 hours</button>
+                <button type="button" class="chip" data-hours="48">+48 hours</button>
+                <button type="button" class="chip" data-hours="168">+7 days</button>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row"><button class="btn" id="issueBtn" type="submit">Issue permit</button></div>
+        </form>
       </div>
-    </div>
+    </section>
 
-    <!-- ACTIVE / BOOK IN -->
-    <div class="tab-panel" id="tab-active" style="display:none;">
+    <!-- ACTIVE -->
+    <section class="panel" id="tab-active" hidden>
       <div class="card">
-        <h2>Active Permits</h2>
-        <div id="activeMsg"></div>
-        <table id="activeTable">
-          <thead><tr><th>Officer</th><th>Firearm</th><th>Valid Until</th><th>Status</th><th></th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="card-head">
+          <div>
+            <div class="card-title">Firearms currently booked out</div>
+            <p class="card-sub" style="margin-bottom:0">Book each firearm back in when the shift ends. Expired permits that are still out are highlighted.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="rtable" id="activeTable">
+            <thead><tr><th>Officer</th><th>Firearm</th><th>Duty</th><th>Valid until</th><th>Status</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- REGISTER -->
+    <section class="panel" id="tab-register" hidden>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Full permit register</div>
+            <p class="card-sub" style="margin-bottom:0">Complete book-out / book-in history. Export for audits or the Designated Firearms Officer.</p>
+          </div>
+          <button class="btn ghost small" id="csvBtn" type="button">Export CSV</button>
+        </div>
+        <div class="filters">
+          <input type="search" id="regSearch" placeholder="Search officer, firearm, serial or permit no.">
+          <select id="regStatus">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired (not booked in)</option>
+            <option value="returned">Returned</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="rtable" id="registerTable">
+            <thead><tr><th>Permit</th><th>Officer</th><th>Firearm</th><th>Issued</th><th>Valid until</th><th>Returned</th><th>Status</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
     <!-- OFFICERS -->
-    <div class="tab-panel" id="tab-officers" style="display:none;">
+    <section class="panel" id="tab-officers" hidden>
       <div class="card">
-        <h2>Add Officer</h2>
+        <div class="card-title">Add an officer</div>
+        <p class="card-sub">Only officers with a valid firearm competency certificate should be added.</p>
         <div id="officerMsg"></div>
-        <label>Full name</label>
-        <input type="text" id="offName">
-        <label>ID number</label>
-        <input type="text" id="offId">
-        <label>PSIRA number</label>
-        <input type="text" id="offPsira">
-        <label>Firearm competency number</label>
-        <input type="text" id="offCompNo">
-        <label>Competency expiry date</label>
-        <input type="date" id="offCompExp">
-        <label>WhatsApp number (format 27XXXXXXXXX)</label>
-        <input type="text" id="offPhone" placeholder="27821234567">
-        <button class="primary" onclick="addOfficer()">Add Officer</button>
+        <form id="officerForm" autocomplete="off">
+          <div class="grid2">
+            <div class="field"><label for="offName">Full name</label><input type="text" id="offName" required></div>
+            <div class="field"><label for="offId">ID number</label><input type="text" id="offId" inputmode="numeric" required></div>
+            <div class="field"><label for="offPsira">PSIRA number</label><input type="text" id="offPsira"></div>
+            <div class="field"><label for="offCompNo">Firearm competency certificate no.</label><input type="text" id="offCompNo" required></div>
+            <div class="field"><label for="offCompExp">Competency expiry date</label><input type="date" id="offCompExp"></div>
+            <div class="field"><label for="offPhone">WhatsApp number</label><input type="tel" id="offPhone" placeholder="082 123 4567" required><div class="hint">South African numbers are converted to international format automatically.</div></div>
+          </div>
+          <div class="btn-row"><button class="btn" type="submit">Add officer</button></div>
+        </form>
       </div>
       <div class="card">
-        <h2>Officers on File</h2>
-        <table id="officersTable">
-          <thead><tr><th>Name</th><th>ID No.</th><th>Competency No.</th><th>Expiry</th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="card-title">Officers on file</div>
+        <div class="table-wrap" style="margin-top:10px">
+          <table class="rtable" id="officersTable">
+            <thead><tr><th>Name</th><th>ID number</th><th>Competency no.</th><th>Expiry</th><th>WhatsApp</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </section>
 
     <!-- FIREARMS -->
-    <div class="tab-panel" id="tab-firearms" style="display:none;">
+    <section class="panel" id="tab-firearms" hidden>
       <div class="card">
-        <h2>Add Firearm</h2>
+        <div class="card-title">Add a firearm</div>
+        <p class="card-sub">Company firearms held under the business licence.</p>
         <div id="firearmMsg"></div>
-        <label>Make</label>
-        <input type="text" id="fMake">
-        <label>Model</label>
-        <input type="text" id="fModel">
-        <label>Calibre</label>
-        <input type="text" id="fCalibre">
-        <label>Serial number</label>
-        <input type="text" id="fSerial">
-        <label>Section 20 licence reference</label>
-        <input type="text" id="fLicenceRef">
-        <button class="primary" onclick="addFirearm()">Add Firearm</button>
+        <form id="firearmForm" autocomplete="off">
+          <div class="grid2">
+            <div class="field"><label for="fMake">Make</label><input type="text" id="fMake" placeholder="Glock" required></div>
+            <div class="field"><label for="fModel">Model</label><input type="text" id="fModel" placeholder="19 Gen 3" required></div>
+            <div class="field"><label for="fCalibre">Calibre</label><input type="text" id="fCalibre" placeholder="9mm Parabellum" required></div>
+            <div class="field"><label for="fSerial">Serial number</label><input type="text" id="fSerial" required></div>
+            <div class="field full"><label for="fLicenceRef">Licence reference</label><input type="text" id="fLicenceRef" placeholder="Section 20 business licence no."></div>
+          </div>
+          <div class="btn-row"><button class="btn" type="submit">Add firearm</button></div>
+        </form>
       </div>
       <div class="card">
-        <h2>Firearms on File</h2>
-        <table id="firearmsTable">
-          <thead><tr><th>Make/Model</th><th>Calibre</th><th>Serial</th><th>Status</th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="card-title">Firearms on file</div>
+        <div class="table-wrap" style="margin-top:10px">
+          <table class="rtable" id="firearmsTable">
+            <thead><tr><th>Make / model</th><th>Calibre</th><th>Serial</th><th>Licence ref.</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </section>
+  </main>
 
-    <!-- FULL REGISTER -->
-    <div class="tab-panel" id="tab-register" style="display:none;">
-      <div class="card">
-        <h2>Full Permit Register</h2>
-        <p style="font-size:12px;color:#666;">Complete record per Firearms Control Regulations 5(5) — export for audit/compliance.</p>
-        <button class="secondary" onclick="exportRegisterCSV()">Export CSV</button>
-        <table id="registerTable" style="margin-top:10px;">
-          <thead><tr><th>Officer</th><th>Firearm</th><th>Issuer</th><th>Issued</th><th>Valid Until</th><th>Returned</th><th>Status</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
   <div class="footer-note">
     IMPI Protection Agency (Pty) Ltd &middot; 10 Kosmos Crescent, Rynoue AH, Roodeplaat, Pretoria<br>
-    info@impi-secure.co.za &middot; 083 782 2207<br>
-    Internal compliance tool. Not a substitute for the officer's physical firearm competency certificate.
+    012 543 0640 &middot; info@impi-secure.co.za &middot; www.impi-secure.co.za<br>
+    Internal compliance tool. The officer must always carry the original firearm competency certificate while on duty.
   </div>
 </div>
 
+<div id="modalHost"></div>
+<div class="toast-host" id="toastHost"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
 <script src="config.js"></script>
+<script src="docket.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
